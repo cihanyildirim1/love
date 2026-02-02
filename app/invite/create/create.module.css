@@ -1,0 +1,679 @@
+.page {
+  --accent-pink: #ff91af;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666;
+  --bg-dark: #0a0a0a;
+  --bg-light: #ffffff;
+
+  min-height: 100vh;
+  background: var(--bg-dark);
+  padding: 40px 20px;
+  font-family: var(--font-geist-sans);
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 32px;
+  transition: all 0.2s;
+  opacity: 0.7;
+  font-weight: 500;
+}
+
+.backLink:hover {
+  opacity: 1;
+  transform: translateX(-4px);
+  color: var(--accent-pink);
+}
+
+/* Form Container */
+.formContainer {
+  background: var(--bg-light);
+  border-radius: 20px;
+  padding: 60px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Progress Bar */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: #1a1a1a;
+  border-radius: 2px;
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent-pink);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 10px var(--accent-pink);
+}
+
+.pageTitle {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.stepIndicator {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 48px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Step Content */
+.stepContent {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stepTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 32px;
+  letter-spacing: -0.5px;
+}
+
+/* Form Styles */
+.inviteForm {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formGroup label {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.formGroup input,
+.formGroup textarea {
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 2px solid #e5e5e5;
+  background: #fafafa;
+  font-size: 16px;
+  color: var(--text-primary);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: var(--font-geist-sans);
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent-pink);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(255, 145, 175, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* Option Grid for tone, speed, etc. */
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.optionCard {
+  padding: 16px 20px;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  background: #fafafa;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+.optionCard:hover {
+  border-color: var(--accent-pink);
+  background: white;
+  color: var(--accent-pink);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.optionCard.selected {
+  border-color: var(--accent-pink);
+  background: var(--accent-pink);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 145, 175, 0.4);
+}
+
+/* Checkbox Label */
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--accent-pink);
+}
+
+/* Response Options */
+.responseOption {
+  padding: 24px;
+  border: 2px solid #e5e5e5;
+  border-radius: 16px;
+  background: #fafafa;
+  margin-bottom: 20px;
+  transition: all 0.2s;
+}
+
+.responseOption:hover {
+  border-color: #d0d0d0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.responseTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.3px;
+}
+
+/* Preview Note */
+.previewNote {
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 16px;
+  border: 2px solid var(--accent-pink);
+  margin-top: 20px;
+}
+
+.previewNote p {
+  font-size: 16px;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.exampleLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-right: 4px;
+}
+
+.exampleChip {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid #e5e5e5;
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+.exampleChip:hover {
+  background: var(--accent-pink);
+  border-color: var(--accent-pink);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 145, 175, 0.3);
+}
+
+/* Navigation Buttons */
+.navigationButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.prevBtn,
+.nextBtn {
+  flex: 1;
+  padding: 16px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+}
+
+.prevBtn {
+  background: #1a1a1a;
+  color: white;
+  border: 2px solid #1a1a1a;
+}
+
+.prevBtn:hover {
+  background: #000;
+  border-color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.nextBtn {
+  background: var(--accent-pink);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 145, 175, 0.3);
+}
+
+.nextBtn:hover {
+  background: #ff7a9e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 145, 175, 0.5);
+}
+
+.submitBtn {
+  flex: 1;
+  padding: 18px 48px;
+  background: var(--accent-pink);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(255, 145, 175, 0.4);
+  letter-spacing: -0.3px;
+}
+
+.submitBtn:hover {
+  background: #ff7a9e;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(255, 145, 175, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .formContainer {
+    padding: 40px 30px;
+  }
+
+  .pageTitle {
+    font-size: 36px;
+  }
+
+  .stepTitle {
+    font-size: 24px;
+  }
+
+  .optionGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .navigationButtons {
+    flex-direction: column;
+  }
+}
+
+/* Old styles kept for compatibility */
+.formRow {
+  .editBtn {
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+    backdrop-filter: blur(10px);
+  }
+
+  .editBtn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: white;
+    transform: translateY(-2px);
+  }
+
+  .animatedInvite {
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    color: white;
+  }
+
+  .line {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .line:nth-child(1) {
+    animation-delay: 0.2s;
+  }
+
+  .line:nth-child(2) {
+    animation-delay: 0.6s;
+  }
+
+  .line:nth-child(3) {
+    animation-delay: 1s;
+  }
+
+  .line:nth-child(4) {
+    animation-delay: 1.4s;
+  }
+
+  .line:nth-child(5) {
+    animation-delay: 1.8s;
+  }
+
+  .line:nth-child(6) {
+    animation-delay: 2.2s;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .word {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+  }
+
+  .line:nth-child(1) .word {
+    font-size: 64px;
+    font-weight: 800;
+    letter-spacing: -2px;
+  }
+
+  .line:nth-child(2) .word {
+    font-size: 32px;
+    font-weight: 400;
+    opacity: 0.95;
+    max-width: 800px;
+    line-height: 1.6;
+  }
+
+  .responseBtn {
+    padding: 20px 60px;
+    background: white;
+    color: var(--accent-pink);
+    border: none;
+    border-radius: 128px;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px rgba(255, 255, 255, 0.4);
+    margin-top: 24px;
+  }
+
+  .responseBtn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 48px rgba(255, 255, 255, 0.6);
+  }
+
+  .bottomActions {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out 2.6s forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .generateBtn {
+    padding: 14px 32px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 128px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+  }
+
+  .generateBtn:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.3);
+    border-color: white;
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+  }
+
+  /* Responsive for preview */
+  @media (max-width: 768px) {
+    .previewHeader {
+      top: 20px;
+      right: 20px;
+    }
+
+    .animatedInvite {
+      gap: 32px;
+      padding: 0 20px;
+    }
+
+    .word {
+      font-size: 32px;
+    }
+
+    .line:nth-child(1) .word {
+      font-size: 42px;
+    }
+
+    .line:nth-child(2) .word {
+      font-size: 22px;
+    }
+
+    .responseBtn {
+      padding: 16px 40px;
+      font-size: 20px;
+    }
+
+    .bottomActions {
+      bottom: 20px;
+    }
+
+    .page {
+      padding: 20px 16px;
+    }
+
+    .formContainer {
+      padding: 32px 24px;
+    }
+
+    .pageTitle {
+      font-size: 36px;
+    }
+
+    .pageDescription {
+      font-size: 16px;
+    }
+
+    .formRow {
+      grid-template-columns: 1fr;
+    }
+
+    .exampleChip {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+
+    .submitBtn {
+      width: 100%;
+      padding: 16px;
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page {
+      padding: 20px 16px;
+    }
+
+    .formContainer {
+      padding: 32px 24px;
+    }
+
+    .pageTitle {
+      font-size: 36px;
+    }
+
+    .pageDescription {
+      font-size: 16px;
+    }
+
+    .formRow {
+      grid-template-columns: 1fr;
+    }
+
+    .exampleChip {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+
+    .submitBtn,
+    .generateBtn {
+      width: 100%;
+      padding: 16px;
+    }
+
+    .inviteCard {
+      padding: 40px 28px;
+    }
+
+    .inviteTitle {
+      font-size: 32px;
+    }
+
+    .inviteMessage {
+      font-size: 16px;
+    }
+
+    .previewHeader {
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-start;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .page {
+      --text-primary: #ededed;
+      --text-secondary: #999;
+
+      background: linear-gradient(135deg, #000 0%, #1a0a0f 100%);
+    }
+
+    .formContainer {
+      background: #0a0a0a;
+    }
+
+    .formGroup input,
+    .formGroup textarea {
+      background: #0a0a0a;
+      border-color: #1a1a1a;
+      color: #ededed;
+    }
+
+    .exampleChip {
+      background: #1a1a1a;
+      border-color: #2a2a2a;
+      color: #ededed;
+    }
+
+    .editBtn,
+    .generateBtn {
+      background: #0a0a0a;
+      border-color: #1a1a1a;
+      color: #ededed;
+    }
+  }
+}
