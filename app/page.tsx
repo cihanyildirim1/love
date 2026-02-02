@@ -60,6 +60,66 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      <footer className={styles.footer}>
+        <div className={styles.footerContent}>
+          <div className={styles.footerBrand}>
+            <h3 className={styles.footerLogo}>💕 Love Invites</h3>
+            <p className={styles.footerTagline}>
+              Create beautiful date invitations that your special someone will
+              never forget.
+            </p>
+          </div>
+
+          <div className={styles.footerLinks}>
+            <div className={styles.footerColumn}>
+              <h4>Product</h4>
+              <ul>
+                <li>
+                  <Link href='/invite/create'>Create Invitation</Link>
+                </li>
+                <li>
+                  <Link href='/themes'>Browse Themes</Link>
+                </li>
+                <li>
+                  <Link href='#features'>Features</Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.footerColumn}>
+              <h4>Support</h4>
+              <ul>
+                <li>
+                  <a href='mailto:support@loveinvites.com'>Contact Us</a>
+                </li>
+                <li>
+                  <Link href='#'>Help Center</Link>
+                </li>
+                <li>
+                  <Link href='#'>FAQ</Link>
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.footerColumn}>
+              <h4>Legal</h4>
+              <ul>
+                <li>
+                  <Link href='#'>Privacy Policy</Link>
+                </li>
+                <li>
+                  <Link href='/terms'>Terms of Service</Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.footerBottom}>
+          <p>&copy; {new Date().getFullYear()} Love Invites. Made with 💖</p>
+        </div>
+      </footer>
     </div>
   );
 }

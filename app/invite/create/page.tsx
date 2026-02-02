@@ -32,12 +32,12 @@ interface InviteData {
   // Response Options
   responseOptions: {
     yes: { enabled: boolean; label: string; followUp: string };
-    maybe: { enabled: boolean; label: string; followUp: string };
     no: { enabled: boolean; label: string; followUp: string };
   };
 
   // Final Touches
   enableMusic: boolean;
+  youtubeLink?: string;
   backgroundTheme: "gradient" | "solid" | "pattern";
 }
 
@@ -75,12 +75,6 @@ export default function CreateInvite() {
         label: "💖 Yes, I'd love to",
         followUp: "I can't wait! This is going to be wonderful.",
       },
-      maybe: {
-        enabled: true,
-        label: "😊 Maybe, tell me more",
-        followUp:
-          "No pressure! Would it help if we talk about the details? I'm flexible.",
-      },
       no: {
         enabled: true,
         label: "🤍 I'm flattered, but no",
@@ -91,6 +85,7 @@ export default function CreateInvite() {
 
     // Final Touches
     enableMusic: false,
+    youtubeLink: "",
     backgroundTheme: "gradient",
   });
 
@@ -132,9 +127,9 @@ export default function CreateInvite() {
   };
 
   const handleResponseOptionChange = (
-    option: "yes" | "maybe" | "no",
+    option: "yes" | "no",
     field: "label" | "followUp",
-    value: string
+    value: string,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -150,8 +145,18 @@ export default function CreateInvite() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sessionStorage.setItem("invitePreview", JSON.stringify(formData));
-    router.push("/invite/create/preview");
+    e.stopPropagation();
+    if (currentStep === 4) {
+      sessionStorage.setItem("invitePreview", JSON.stringify(formData));
+      router.push("/invite/create/preview");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    // Prevent Enter key from submitting the form unless on the submit button
+    if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "BUTTON") {
+      e.preventDefault();
+    }
   };
 
   const nextStep = () => {
@@ -180,7 +185,11 @@ export default function CreateInvite() {
           <h1 className={styles.pageTitle}>Create Your Invitation</h1>
           <p className={styles.stepIndicator}>Step {currentStep} of 4</p>
 
-          <form className={styles.inviteForm} onSubmit={handleSubmit}>
+          <form
+            className={styles.inviteForm}
+            onSubmit={handleSubmit}
+            onKeyDown={handleKeyDown}
+          >
             {/* Step 1: Basic Information */}
             {currentStep === 1 && (
               <div className={styles.stepContent}>
@@ -319,7 +328,7 @@ export default function CreateInvite() {
                         >
                           {type.charAt(0).toUpperCase() + type.slice(1)}
                         </button>
-                      )
+                      ),
                     )}
                     <button
                       type='button'
@@ -434,12 +443,15 @@ export default function CreateInvite() {
                     ))}
                   </div>
                 </div>
+              </div>
+            )}
 
-                <h2 className={styles.stepTitle} style={{ marginTop: "3rem" }}>
-                  💬 Response Options
-                </h2>
+            {/* Step 4: Response Options & Final Touches */}
+            {currentStep === 4 && (
+              <div className={styles.stepContent}>
+                <h2 className={styles.stepTitle}>💬 Response Options</h2>
 
-                {(["yes", "maybe", "no"] as const).map((option) => (
+                {(["yes", "no"] as const).map((option) => (
                   <div key={option} className={styles.responseOption}>
                     <h3 className={styles.responseTitle}>
                       {option.charAt(0).toUpperCase() + option.slice(1)}{" "}
@@ -454,7 +466,7 @@ export default function CreateInvite() {
                           handleResponseOptionChange(
                             option,
                             "label",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                       />
@@ -467,7 +479,7 @@ export default function CreateInvite() {
                           handleResponseOptionChange(
                             option,
                             "followUp",
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         rows={2}
@@ -475,13 +487,10 @@ export default function CreateInvite() {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
 
-            {/* Step 4: Final Touches */}
-            {currentStep === 4 && (
-              <div className={styles.stepContent}>
-                <h2 className={styles.stepTitle}>✨ Final Touches</h2>
+                <h2 className={styles.stepTitle} style={{ marginTop: "3rem" }}>
+                  ✨ Final Touches
+                </h2>
 
                 <div className={styles.formGroup}>
                   <label>Background Theme</label>
@@ -502,7 +511,7 @@ export default function CreateInvite() {
                         >
                           {theme.charAt(0).toUpperCase() + theme.slice(1)}
                         </button>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -519,6 +528,24 @@ export default function CreateInvite() {
                     Enable soft background music
                   </label>
                 </div>
+
+                {formData.enableMusic && (
+                  <div className={styles.formGroup}>
+                    <label>YouTube Link (optional)</label>
+                    <input
+                      type='text'
+                      value={formData.youtubeLink || ""}
+                      onChange={(e) =>
+                        handleInputChange("youtubeLink", e.target.value)
+                      }
+                      placeholder='https://youtube.com/watch?v=...'
+                    />
+                    <small className={styles.inputHint}>
+                      Paste a YouTube link for background music. Your guest can
+                      choose to play it.
+                    </small>
+                  </div>
+                )}
 
                 <div className={styles.previewNote}>
                   <p>
@@ -549,7 +576,14 @@ export default function CreateInvite() {
                   Next →
                 </button>
               ) : (
-                <button type='submit' className={styles.submitBtn}>
+                <button
+                  type='button'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit(e as any);
+                  }}
+                  className={styles.submitBtn}
+                >
                   Preview Invitation ✨
                 </button>
               )}

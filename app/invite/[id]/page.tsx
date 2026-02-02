@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useMemo } from "react";
 import styles from "./invite.module.css";
 
 export default function InvitePage({
@@ -11,8 +11,11 @@ export default function InvitePage({
   const { id } = use(params);
   const [screen, setScreen] = useState(1);
   const [response, setResponse] = useState<"yes" | "maybe" | "no" | null>(null);
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const [inviteData, setInviteData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [musicPlaying, setMusicPlaying] = useState(false);
 
   useEffect(() => {
     // Try to load data from localStorage (temporary solution until we have a backend)
@@ -20,7 +23,11 @@ export default function InvitePage({
 
     if (storedData) {
       // Use the actual data created by the user
-      setInviteData(JSON.parse(storedData));
+      const parsedData = JSON.parse(storedData);
+      console.log("Loaded invite data:", parsedData);
+      console.log("Enable Music:", parsedData.enableMusic);
+      console.log("YouTube Link:", parsedData.youtubeLink);
+      setInviteData(parsedData);
     } else {
       // Fallback to mock data if nothing is stored
       setInviteData({
@@ -53,6 +60,100 @@ export default function InvitePage({
     setLoading(false);
   }, [id]);
 
+  const parseYouTubeId = (url: string) => {
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("youtu.be")) return u.pathname.slice(1);
+      if (u.searchParams.has("v")) return u.searchParams.get("v");
+      const path = u.pathname.split("/");
+      return path[path.length - 1] || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const handlePlayMusic = () => {
+    setMusicPlaying(true);
+  };
+
+  const handleStopMusic = () => {
+    setMusicPlaying(false);
+  };
+
+  const generateCalendarLink = (type: "google" | "apple" | "outlook") => {
+    const startDate = new Date(`${inviteData.date}T${inviteData.time}`);
+    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
+
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    };
+
+    const title = encodeURIComponent("Date Together");
+    const details = encodeURIComponent(
+      inviteData.invitationSentence || "Special date",
+    );
+    const location = encodeURIComponent(inviteData.location);
+
+    if (type === "google") {
+      const startStr = formatDate(startDate);
+      const endStr = formatDate(endDate);
+      return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startStr}/${endStr}`;
+    } else if (type === "apple" || type === "outlook") {
+      // Generate ICS file content
+      const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART:${formatDate(startDate)}
+DTEND:${formatDate(endDate)}
+SUMMARY:Date Together
+DESCRIPTION:${inviteData.invitationSentence || "Special date"}
+LOCATION:${inviteData.location}
+END:VEVENT
+END:VCALENDAR`;
+      const blob = new Blob([icsContent], { type: "text/calendar" });
+      return URL.createObjectURL(blob);
+    }
+    return "";
+  };
+
+  const handleAddToCalendar = (type: "google" | "apple" | "outlook") => {
+    const link = generateCalendarLink(type);
+    if (type === "google") {
+      window.open(link, "_blank");
+    } else {
+      const a = document.createElement("a");
+      a.href = link;
+      a.download = "date-invitation.ics";
+      a.click();
+    }
+  };
+
+  // Background Music Component - memoized to prevent re-renders
+  const BackgroundMusic = useMemo(() => {
+    if (!inviteData?.enableMusic || !inviteData?.youtubeLink) return null;
+
+    const videoId = parseYouTubeId(inviteData.youtubeLink);
+    if (!videoId) return null;
+
+    return (
+      <iframe
+        key='persistent-music'
+        title='background-music'
+        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&loop=1&playlist=${videoId}&enablejsapi=1&rel=0`}
+        allow='autoplay; encrypted-media'
+        style={{
+          position: "fixed",
+          width: 1,
+          height: 1,
+          left: -9999,
+          top: -9999,
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+      />
+    );
+  }, [inviteData?.enableMusic, inviteData?.youtubeLink]);
+
   if (loading || !inviteData) {
     return (
       <div className={styles.screenContainer}>
@@ -62,6 +163,24 @@ export default function InvitePage({
       </div>
     );
   }
+
+  // Music control button (shown on all screens if music is enabled)
+  const MusicControl = () => {
+    if (!inviteData?.enableMusic || !inviteData?.youtubeLink) return null;
+    return (
+      <div className={styles.musicControl}>
+        {!musicPlaying ? (
+          <button className={styles.musicBtn} onClick={handlePlayMusic}>
+            Play Music
+          </button>
+        ) : (
+          <button className={styles.musicBtn} onClick={handleStopMusic}>
+            Stop Music
+          </button>
+        )}
+      </div>
+    );
+  };
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -87,15 +206,25 @@ export default function InvitePage({
     }
   };
 
-  const handleResponse = (answer: "yes" | "maybe" | "no") => {
-    setResponse(answer);
-    setScreen(7);
+  const handleResponse = (answer: "yes" | "no") => {
+    if (answer === "yes" && !showFollowUp) {
+      setShowFollowUp(true);
+      setResponse(answer);
+    } else if (answer === "yes" && showFollowUp) {
+      setConfirmed(true);
+    } else if (answer === "no") {
+      setResponse(answer);
+      setScreen(7);
+    }
   };
+  // Render content based on screen
+  let screenContent;
 
   // Screen 1: Curiosity Hook
   if (screen === 1) {
-    return (
+    screenContent = (
       <div className={styles.screenContainer} onClick={handleContinue}>
+        <MusicControl />
         <div className={`${styles.content} ${styles.fadeIn}`}>
           <p className={styles.subtleText}>{inviteData.openingLine}</p>
           <div className={styles.tapHint}>Tap to continue</div>
@@ -105,9 +234,10 @@ export default function InvitePage({
   }
 
   // Screen 2: Emotional Warm-up
-  if (screen === 2) {
-    return (
+  else if (screen === 2) {
+    screenContent = (
       <div className={styles.screenContainer} onClick={handleContinue}>
+        <MusicControl />
         <div className={`${styles.content} ${styles.fadeIn}`}>
           <p className={styles.anticipationText}>
             They've been wanting to ask you something…
@@ -119,9 +249,10 @@ export default function InvitePage({
   }
 
   // Screen 3: Personal Touch
-  if (screen === 3) {
-    return (
+  else if (screen === 3) {
+    screenContent = (
       <div className={styles.screenContainer} onClick={handleContinue}>
+        <MusicControl />
         <div className={`${styles.content} ${styles.fadeIn}`}>
           <p className={styles.personalText}>
             Because you're{" "}
@@ -134,9 +265,10 @@ export default function InvitePage({
   }
 
   // Screen 4: Vulnerability
-  if (screen === 4) {
-    return (
+  else if (screen === 4) {
+    screenContent = (
       <div className={styles.screenContainer} onClick={handleContinue}>
+        <MusicControl />
         <div className={`${styles.content} ${styles.fadeIn}`}>
           <p className={styles.vulnerableText}>
             {inviteData.vulnerabilityLine}
@@ -148,9 +280,10 @@ export default function InvitePage({
   }
 
   // Screen 5: The Ask
-  if (screen === 5) {
-    return (
+  else if (screen === 5) {
+    screenContent = (
       <div className={styles.screenContainer} onClick={handleContinue}>
+        <MusicControl />
         <div className={`${styles.content} ${styles.fadeIn}`}>
           <h1 className={styles.theAsk}>{inviteData.invitationSentence}</h1>
           <div className={styles.tapHint}>Tap to continue</div>
@@ -160,32 +293,33 @@ export default function InvitePage({
   }
 
   // Screen 6: The Options
-  if (screen === 6) {
-    return (
+  else if (screen === 6 && !confirmed) {
+    screenContent = (
       <div className={styles.screenContainer}>
+        <MusicControl />
         <div className={`${styles.content} ${styles.fadeIn}`}>
           <div className={styles.dateDetails}>
-            <p className={styles.detailLine}>
-              📅 {formatDate(inviteData.date)}
-            </p>
-            <p className={styles.detailLine}>
-              🕐 {formatTime(inviteData.time)}
-            </p>
-            <p className={styles.detailLine}>📍 {inviteData.location}</p>
+            <p className={styles.detailLine}>{formatDate(inviteData.date)}</p>
+            <p className={styles.detailLine}>{formatTime(inviteData.time)}</p>
+            <p className={styles.detailLine}>{inviteData.location}</p>
           </div>
+
+          {showFollowUp && (
+            <div className={styles.followUpBanner}>
+              <p className={styles.followUpText}>
+                {inviteData.responseOptions.yes.followUp}
+              </p>
+            </div>
+          )}
 
           <div className={styles.optionsContainer}>
             <button
               className={`${styles.optionBtn} ${styles.yesBtn}`}
               onClick={() => handleResponse("yes")}
             >
-              {inviteData.responseOptions.yes.label}
-            </button>
-            <button
-              className={`${styles.optionBtn} ${styles.maybeBtn}`}
-              onClick={() => handleResponse("maybe")}
-            >
-              {inviteData.responseOptions.maybe.label}
+              {showFollowUp
+                ? "Confirm Yes"
+                : inviteData.responseOptions.yes.label}
             </button>
             <button
               className={`${styles.optionBtn} ${styles.noBtn}`}
@@ -199,71 +333,99 @@ export default function InvitePage({
     );
   }
 
+  // Confirmation Page
+  else if (confirmed) {
+    screenContent = (
+      <div className={styles.confirmationPage}>
+        <div className={styles.confirmationCard}>
+          <div className={styles.confirmationHeader}>
+            <h1 className={styles.confirmationTitle}>It's a Date!</h1>
+            <p className={styles.confirmationSubtitle}>
+              Your response has been sent and they'll be so happy to hear from
+              you.
+            </p>
+          </div>
+
+          <div className={styles.dateCard}>
+            <h2 className={styles.dateCardTitle}>Date Details</h2>
+            <div className={styles.dateInfo}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Date</span>
+                <span className={styles.infoValue}>
+                  {formatDate(inviteData.date)}
+                </span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Time</span>
+                <span className={styles.infoValue}>
+                  {formatTime(inviteData.time)}
+                </span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Location</span>
+                <span className={styles.infoValue}>{inviteData.location}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.messageSection}>
+            <p className={styles.sweetMessage}>
+              Looking forward to spending time together. This is going to be
+              wonderful.
+            </p>
+          </div>
+
+          <div className={styles.calendarSection}>
+            <h3 className={styles.calendarTitle}>Add to Calendar</h3>
+            <div className={styles.calendarButtons}>
+              <button
+                className={styles.calendarBtn}
+                onClick={() => handleAddToCalendar("google")}
+              >
+                Google Calendar
+              </button>
+              <button
+                className={styles.calendarBtn}
+                onClick={() => handleAddToCalendar("apple")}
+              >
+                Apple Calendar
+              </button>
+              <button
+                className={styles.calendarBtn}
+                onClick={() => handleAddToCalendar("outlook")}
+              >
+                Outlook
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Screen 7: After-Click Experience
-  if (screen === 7 && response) {
-    if (response === "yes") {
-      return (
-        <div className={styles.screenContainer}>
-          <div
-            className={`${styles.content} ${styles.fadeIn} ${styles.confetti}`}
-          >
-            <h1 className={styles.celebrationTitle}>🎉 Amazing! 🎉</h1>
-            <p className={styles.celebrationText}>
-              I can't wait! This is going to be wonderful.
-            </p>
-            <div className={styles.replyBox}>
-              <p className={styles.replyLabel}>Want to add a message?</p>
-              <textarea
-                className={styles.replyInput}
-                placeholder='Type something sweet (optional)...'
-                rows={3}
-              />
-              <button className={styles.sendReplyBtn}>Send Reply 💌</button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    if (response === "maybe") {
-      return (
-        <div className={styles.screenContainer}>
-          <div className={`${styles.content} ${styles.fadeIn}`}>
-            <h1 className={styles.followUpTitle}>No pressure! 💗</h1>
-            <p className={styles.followUpText}>
-              Would it help if we talk about the details? I'm flexible on timing
-              and location.
-            </p>
-            <div className={styles.replyBox}>
-              <textarea
-                className={styles.replyInput}
-                placeholder='What would work better for you?'
-                rows={3}
-              />
-              <button className={styles.sendReplyBtn}>Send Message</button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
+  else if (screen === 7 && response) {
     if (response === "no") {
-      return (
+      screenContent = (
         <div className={styles.screenContainer}>
           <div className={`${styles.content} ${styles.fadeIn}`}>
-            <h1 className={styles.respectTitle}>
-              Thank you for being honest 🤍
-            </h1>
+            <h1 className={styles.respectTitle}>Thank you for being honest</h1>
             <p className={styles.respectText}>
               I really appreciate you taking the time to look at this. Your
               friendship means a lot to me.
             </p>
-            <p className={styles.respectSubtext}>Take care 💫</p>
+            <p className={styles.respectSubtext}>Take care</p>
           </div>
         </div>
       );
     }
   }
 
-  return null;
+  // Render the screen content with persistent background music
+  return (
+    <>
+      {musicPlaying && BackgroundMusic}
+      {screenContent}
+    </>
+  );
 }
